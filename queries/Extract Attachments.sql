@@ -10,7 +10,18 @@ DECLARE @outPutPath varchar(50) = 'C:\Users\MSSQLSERVER\Documents'
 DECLARE @Doctable TABLE (id int identity(1,1), [Doc_Num]  varchar(100) , [Name]  varchar(100), [FileData] varBinary(max) )
  
 INSERT INTO @Doctable([Doc_Num] , [Name],[FileData])
-Select TOP 5 [Id] , [Name],[FileData] FROM  [dbo].Attachment
+SELECT a.Id, a.Name, a.FileData
+FROM dbo.Attachment a
+JOIN Project_X_Task pxt ON a.Id = pxt.AttachmentId
+JOIN TaskType tt ON pxt.TaskTypeId = tt.Id
+JOIN Project p ON pxt.ProjectId = p.Id
+JOIN Funding f ON p.FundingProgId = f.Id
+JOIN FundingEntity fe ON f.FunderEntityId = fe.Id
+WHERE a.Category = 'TMF Assessment'
+AND a.FileType IN ('.xls', '.xlsx')
+AND tt.Task IN ('Initial TMF Assessment', 'Closing TMF Assessment')
+AND fe.[Name] IN ('USDA Rural Development', 'HHS/OCS', 'US EPA')
+
  
 --SELECT * FROM @table
 
